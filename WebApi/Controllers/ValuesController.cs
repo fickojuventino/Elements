@@ -84,8 +84,12 @@ namespace WebApi.Controllers
 
         // POST api/values
         [HttpPost]
-        public void Post([FromBody] string value)
+        public void Post([FromBody]Elements value)
         {
+            if(!ModelState.IsValid)
+                throw new InvalidOperationException("Invalid");
+            Console.WriteLine(value.output);
+            Console.WriteLine(value.elementi[0].identifikacioniKod);
         }
 
         // PUT api/values/5
@@ -99,5 +103,21 @@ namespace WebApi.Controllers
         public void Delete(int id)
         {
         }
+    }
+
+    public class Elements{
+        public string output { get; set;}
+        public List<ElementP> elementi{ get; set; }
+    }
+
+    public class ElementP{
+        public int identifikacioniKod{ get; set; }
+        public DateTime vremePretrage{ get; set; }
+        public List<ElementC> elementi {get; set; }
+    }
+
+    public class ElementC{
+        public char grupa{ get; set; }
+        public int vrednost{ get; set; }
     }
 }
