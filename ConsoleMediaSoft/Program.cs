@@ -156,12 +156,6 @@ namespace ConsoleMediaSoft
                     }
                     i++;
                 }
-
-                //while (odr.Read())
-                //{
-                //    if (odr.HasRows)
-                //        Console.WriteLine(odr["grupa"].ToString());
-                //}
                 con.Close();
             }
         }

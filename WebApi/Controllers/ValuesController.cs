@@ -1,8 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Data;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
+using Oracle.ManagedDataAccess.Client;
+using System.Globalization;
 
 namespace WebApi.Controllers
 {
@@ -12,9 +15,64 @@ namespace WebApi.Controllers
     {
         // GET api/values
         [HttpGet]
-        public ActionResult<IEnumerable<string>> Get()
+        public string Get(string date, string time)
         {
-            return new string[] { "value1", "value2" };
+                string conString = "User Id=S15315;Password=S15315;Data Source=gislab-oracle.elfak.ni.ac.rs:1521/SBP_PDB;";
+
+                using (OracleConnection con = new OracleConnection(conString))
+                {
+                    using (OracleCommand cmd = con.CreateCommand())
+                    {
+                        try
+                        {
+                            con.Open();
+                            cmd.BindByName = true;                            
+
+                            // format za date dd/mm/yyyy
+                            string iString = $"{date} {time}";
+                            var outputCulture = CultureInfo.CreateSpecificCulture("es-es");
+                            DateTime now = DateTime.Parse(DateTime.Now.ToString());
+                            DateTime input = DateTime.Parse(iString, outputCulture);
+
+                            if(now < input)
+                                return "You can not insert Date higher than current.";
+
+                            cmd.CommandText = "select elementp.identifikacioni_kod, elementc.id, elementp.redni_broj, elementc.grupa, elementc.vrednost, elementp.vreme_pretrage from elementp"
+                            + " join elementc on elementp.identifikacioni_kod = elementc.idkod";
+
+                            //Execute the command and use DataReader to display the data
+                            OracleDataReader reader = cmd.ExecuteReader();
+                            string output = "";
+                            int i = -1;
+                            while(reader.Read()){
+                                if(i != int.Parse(reader["identifikacioni_kod"].ToString())){
+                                    string vreme = reader["vreme_pretrage"].ToString().Split(' ')[0] + " " + reader["vreme_pretrage"].ToString().Split(' ')[1];
+                                    i = int.Parse(reader["identifikacioni_kod"].ToString());
+
+                                    if(input <= DateTime.Parse(vreme, outputCulture)) {
+                                        output += "ElementP: " + reader["identifikacioni_kod"] + " redni broj:" + reader["redni_broj"] + 
+                                        ". Elementi:\n\tElementc: " + reader["id"] + " grupa: " + reader["grupa"] + " vrednost: " + reader["vrednost"] +
+                                        " vreme pretrage: " + reader["vreme_pretrage"] + ".\n";
+                                    }
+                                    else{
+                                        return "No entry with inputed date.";
+                                    }
+                                }
+                                else{
+                                    output += "\tElementc: " + reader["id"] + " grupa: " + reader["grupa"] + " vrednost: " 
+                                    + reader["vrednost"] + " vreme pretrage: " + reader["vreme_pretrage"] + ".\n";
+                                }
+                            }
+
+                            reader.Dispose();
+                            return output;
+                        }
+                        catch (Exception ex)
+                        {
+                            return ex.Message;
+                        }
+                    }
+                }
         }
 
         // GET api/values/5
