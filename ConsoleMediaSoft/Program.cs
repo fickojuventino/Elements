@@ -7,11 +7,19 @@ using ConsoleMediaSoft.Elementi;
 using Newtonsoft.Json;
 using Oracle.ManagedDataAccess.Client;
 using System.Data;
+using System.Net;
+using System.Net.Http;
+using System.Net.Http.Headers;
+using System.IO;
+using System.Net.Security;
 
 namespace ConsoleMediaSoft
 {
     class Program
     {
+        static HttpClient client = new HttpClient();
+        
+
         static void Main(string[] args)
         {
             Console.WriteLine("Welcome to Elementi App..\nChoose input type: 1 - keyboard 2 - JSON");
@@ -69,6 +77,25 @@ namespace ConsoleMediaSoft
                             ElementP el = FindByID(kod, elements);
                             if (el != null) el.PrintElement();
                         }
+                        break;
+                    case 3:
+                        Console.WriteLine("Insert date[format dd/mm/yyyy]: ");
+                        string date = Console.ReadLine();
+                        Console.WriteLine("Insert time[format hh:mi]: ");
+                        string time = Console.ReadLine();
+                        url = $"https://localhost:5001/api/values?date=" + date + "&time=" + time;
+                        ServicePointManager.ServerCertificateValidationCallback = new RemoteCertificateValidationCallback
+                        (
+                           delegate { return true; }
+                        );
+                        ServicePointManager.SecurityProtocol = SecurityProtocolType.Tls12 | SecurityProtocolType.Tls11 | SecurityProtocolType.Tls;
+                        var request = (HttpWebRequest)WebRequest.Create(url);
+                        
+                        var response = (HttpWebResponse)request.GetResponse();
+
+                        var responseString = new StreamReader(response.GetResponseStream()).ReadToEnd();
+                        Console.WriteLine(responseString);
+
                         break;
                     default:
                         Console.WriteLine("You've inserted wrong number!");
@@ -194,6 +221,26 @@ namespace ConsoleMediaSoft
             }
 
             return list;
+        }
+
+        static async Task MyAPIGet(HttpClient cons)
+        {
+            using (cons)
+            {
+                HttpResponseMessage res = await cons.GetAsync("api/values");
+                res.EnsureSuccessStatusCode();
+                if (res.IsSuccessStatusCode)
+                {
+                    string elements = await res.Content.ReadAsAsync<string>();
+                    Console.WriteLine("\n");
+                    Console.WriteLine("---------------------Calling Get Operation------------------------");
+                    Console.WriteLine("\n");
+                    Console.WriteLine("tagId    tagName          tagDescription");
+                    Console.WriteLine("-----------------------------------------------------------");
+                    Console.WriteLine(elements);
+                    Console.ReadLine();
+                }
+            }
         }
     }
 }

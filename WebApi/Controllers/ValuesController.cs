@@ -29,7 +29,9 @@ namespace WebApi.Controllers
                             cmd.BindByName = true;                            
 
                             // format za date dd/mm/yyyy
+                            // string iString = "05/08/2019 11:04";
                             string iString = $"{date} {time}";
+                            Console.WriteLine(date + " " + time);
                             var outputCulture = CultureInfo.CreateSpecificCulture("es-es");
                             DateTime now = DateTime.Parse(DateTime.Now.ToString());
                             DateTime input = DateTime.Parse(iString, outputCulture);
