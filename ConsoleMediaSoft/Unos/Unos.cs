@@ -11,6 +11,13 @@ namespace ConsoleMediaSoft.Unos
         public string N { get; set; }
         public string M { get; set; }
     }
+
+    public class Root
+    {
+        public string output { get; set; }
+        public List<Rootobject> elementi { get; set; }
+    }
+
     public class Rootobject
     {
         public int identifikacioni_kod { get; set; }
@@ -24,7 +31,6 @@ namespace ConsoleMediaSoft.Unos
         public char grupa { get; set; }
         public int vrednost { get; set; }
     }
-
 }
 
 

@@ -12,6 +12,7 @@ using System.Net.Http;
 using System.Net.Http.Headers;
 using System.IO;
 using System.Net.Security;
+using System.Collections.Specialized;
 
 namespace ConsoleMediaSoft
 {
@@ -53,10 +54,12 @@ namespace ConsoleMediaSoft
                             List<ElementP> founded = FindByValue(kod, elements);
                             if (founded.Count > 0)
                             {
-                                Console.WriteLine("Desired output? DB/JSON");
-                                string output = Console.ReadLine();
-                                SaveToDB(founded, output);
-                                SaveToJSON(founded);
+                                PostAsync(founded);
+
+                                //Console.WriteLine("Desired output? DB/JSON");
+                                //string output = Console.ReadLine();
+                                //SaveToDB(founded, output);
+                                //SaveToJSON(founded);
                             }
                         }
                         break;
@@ -197,17 +200,17 @@ namespace ConsoleMediaSoft
                     identifikacioni_kod = ep.IdentifikacioniKod,
                     redni_broj = ep.RedniBroj,
                     vreme_pretrage = DateTime.Now.ToString(),
-                    elementi = GetSubElements(ep.Elementi)
+                    elementi = GetSubElementsC(ep.Elementi)
                 }); 
             }
 
             string json = JsonConvert.SerializeObject(list, Formatting.Indented);
 
             //write string to file
-            System.IO.File.WriteAllText(@"c:\izlaz.json", json);
+            File.WriteAllText(@"c:\izlaz.json", json);
         }
 
-        private static List<Unos.Elementi> GetSubElements(List<ElementC> array)
+        private static List<Unos.Elementi> GetSubElementsC(List<ElementC> array)
         {
             List<Unos.Elementi> list = new List<Unos.Elementi>();
 
@@ -223,22 +226,52 @@ namespace ConsoleMediaSoft
             return list;
         }
 
-        static async Task MyAPIGet(HttpClient cons)
+        private static List<Unos.Rootobject> GetSubElementsP(List<ElementP> array)
         {
-            using (cons)
+            List<Unos.Rootobject> list = new List<Unos.Rootobject>();
+
+            foreach (ElementP ep in array)
             {
-                HttpResponseMessage res = await cons.GetAsync("api/values");
-                res.EnsureSuccessStatusCode();
-                if (res.IsSuccessStatusCode)
+                list.Add(new Unos.Rootobject()
                 {
-                    string elements = await res.Content.ReadAsAsync<string>();
-                    Console.WriteLine("\n");
-                    Console.WriteLine("---------------------Calling Get Operation------------------------");
-                    Console.WriteLine("\n");
-                    Console.WriteLine("tagId    tagName          tagDescription");
-                    Console.WriteLine("-----------------------------------------------------------");
-                    Console.WriteLine(elements);
-                    Console.ReadLine();
+                    identifikacioni_kod = ep.IdentifikacioniKod,
+                    redni_broj = ep.RedniBroj,
+                    elementi = GetSubElementsC(ep.Elementi)
+                });
+            }
+
+            return list;
+        }
+
+        static void PostAsync(List<ElementP> array)
+        {
+            using (var client = new HttpClient())
+            {
+                ServicePointManager.ServerCertificateValidationCallback = new RemoteCertificateValidationCallback
+                (
+                   delegate { return true; }
+                );
+                ServicePointManager.SecurityProtocol = SecurityProtocolType.Tls12 | SecurityProtocolType.Tls11 | SecurityProtocolType.Tls;
+
+                var httpWebRequest = (HttpWebRequest)WebRequest.Create("https://localhost:5001/api/values");
+                httpWebRequest.ContentType = "application/json";
+                httpWebRequest.Method = "POST";
+
+                using (var streamWriter = new StreamWriter(httpWebRequest.GetRequestStream()))
+                {
+                    Unos.Root obj = new Unos.Root()
+                    {
+                        elementi = GetSubElementsP(array)
+                    };
+                    string json = JsonConvert.SerializeObject(obj, Formatting.Indented);
+
+                    streamWriter.Write(json);
+                }
+
+                var httpResponse = (HttpWebResponse)httpWebRequest.GetResponse();
+                using (var streamReader = new StreamReader(httpResponse.GetResponseStream()))
+                {
+                    var result = streamReader.ReadToEnd();
                 }
             }
         }
