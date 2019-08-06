@@ -45,55 +45,6 @@ namespace WebApi
 
             app.UseHttpsRedirection();
             app.UseMvc();
-
-            app.Run(async(context) => {
-                //Demo: Basic ODP.NET Core application for ASP.NET Core
-                // to connect, query, and return results to a web page
-
-                //Create a connection to Oracle			
-                string conString = "User Id=S15315;Password=S15315;" +
-
-                //How to connect to an Oracle DB without SQL*Net configuration file
-                //  also known as tnsnames.ora.
-                "Data Source=gislab-oracle.elfak.ni.ac.rs:1521/SBP_PDB;";
-
-                //How to connect to an Oracle DB with a DB alias.
-                //Uncomment below and comment above.
-                //"Data Source=<service name alias>;";
-
-                using (OracleConnection con = new OracleConnection(conString))
-                {
-                    using (OracleCommand cmd = con.CreateCommand())
-                    {
-                        try
-                        {
-                            con.Open();
-                            cmd.BindByName = true;                            
-
-                            //Use the command to display employee names from 
-                            // the EMPLOYEES table
-                            cmd.CommandText = "select vrednost from elementc where id = 1";
-
-                            // Assign id to the department number 50 
-                            OracleParameter id = new OracleParameter("id", 50);
-                            cmd.Parameters.Add(id);
-
-                            //Execute the command and use DataReader to display the data
-                            OracleDataReader reader = cmd.ExecuteReader();
-                            while (reader.Read())
-                            {
-                                await context.Response.WriteAsync("Employee First Name: " + reader.GetValue(0) + "\n");
-                            }
-
-                            reader.Dispose();
-                        }
-                        catch (Exception ex)
-                        {
-                            await context.Response.WriteAsync(ex.Message);
-                        }
-                    }
-                }
-            });
         }
     }
 }
