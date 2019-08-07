@@ -64,7 +64,7 @@ namespace WebApi.Controllers
                                         + " vreme pretrage: " + reader["vreme_pretrage"] + ".\n";
                                     if(i != int.Parse(reader["identifikacioni_kod"].ToString())){
                                         i = int.Parse(reader["identifikacioni_kod"].ToString());
-                                        output += "ElementP: " + reader["identifikacioni_kod"] + " redni broj:" + reader["redni_broj"] + 
+                                        output += "\nElementP: " + reader["identifikacioni_kod"] + " redni broj:" + reader["redni_broj"] + 
                                         ". Elementi:\n";
                                         output += cString;
                                     }

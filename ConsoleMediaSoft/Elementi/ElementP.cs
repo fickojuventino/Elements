@@ -5,25 +5,25 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace ConsoleMediaSoft
+namespace ConsoleMediaSoft.Elementi
 {
-    public class ElementP
+    public class ElementP : IElement
     {
         private int _redniBroj;
         private int _identifikacioniKod;
         private List<ElementC> _elementi;
 
-        public ElementP(int rb)
+        public ElementP(int rb, int id)
         {
             _elementi = new List<ElementC>();
-            _identifikacioniKod = 1000; // to-do: generate idetifikacioniKod
+            _identifikacioniKod = id;
             _redniBroj = rb;
         }
 
         public int RedniBroj
         {
             get { return _redniBroj; }
-            set { _redniBroj = value; } // ukoliko treba da se azurira 
+            set { _redniBroj = value; }
         }
         public int IdentifikacioniKod
         {

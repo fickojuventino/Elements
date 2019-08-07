@@ -20,8 +20,8 @@ namespace ConsoleMediaSoft.Unos
 
     public class Rootobject
     {
-        public int identifikacioni_kod { get; set; }
-        public int redni_broj { get; set; }
+        public string identifikacioni_kod { get; set; }
+        public string redni_broj { get; set; }
         public string vreme_pretrage { get; set; }
         public List<Elementi> elementi { get; set; }
     }
@@ -29,7 +29,7 @@ namespace ConsoleMediaSoft.Unos
     public class Elementi
     {
         public char grupa { get; set; }
-        public int vrednost { get; set; }
+        public string vrednost { get; set; }
     }
 }
 

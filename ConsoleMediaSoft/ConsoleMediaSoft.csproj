@@ -64,10 +64,18 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Elementi\App.cs" />
     <Compile Include="Elementi\ElementC.cs" />
     <Compile Include="Elementi\ElementP.cs" />
+    <Compile Include="Elementi\IElement.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Ulaz-Izlaz\API.cs" />
+    <Compile Include="Ulaz-Izlaz\Context.cs" />
+    <Compile Include="Ulaz-Izlaz\IInput.cs" />
+    <Compile Include="Ulaz-Izlaz\IOutput.cs" />
+    <Compile Include="Ulaz-Izlaz\JSON.cs" />
+    <Compile Include="Ulaz-Izlaz\Keyboard.cs" />
     <Compile Include="Unos\Unos.cs" />
   </ItemGroup>
   <ItemGroup>
