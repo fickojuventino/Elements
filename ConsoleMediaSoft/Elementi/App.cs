@@ -241,8 +241,8 @@ namespace ConsoleMediaSoft.Elementi
 
             var request = (HttpWebRequest)WebRequest.Create(url);
             var response = (HttpWebResponse)request.GetResponse();
+            Console.WriteLine("\n" + response.Headers);
             var responseString = new StreamReader(response.GetResponseStream()).ReadToEnd();
-
             Console.WriteLine(responseString);
         }
     }
